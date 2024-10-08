@@ -34,18 +34,29 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
+public_users.get('/',function async (req, res) {
   //Write your code here
   res.send(JSON.stringify(books,null,4));
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
+public_users.get('/isbn/:isbn', function (req, res) {
   const ISBN = req.params.isbn;
-  
-  res.send(books[ISBN])
- });
+
+  new Promise((resolve, reject) => {
+    if (books[ISBN]) {
+      resolve(books[ISBN]);
+    } else {
+      reject("Book not found");
+    }
+  })
+  .then((book) => {
+    res.send(book);
+  })
+  .catch((err) => {
+    res.status(404).send({ error: err });
+  });
+});
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
